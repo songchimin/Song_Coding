@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.study.springboot.dao.Web_ChallengeDao">
+
+   <select id="All_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge
+   </select>
+
+   <select id="All_RegisterWait_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 0
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+
+   <select id="AllWaitchallengeCount" resultType="int">
+      select count(*) from challenge where challenge_state = 0
+   </select>
+   
+   
+   <select id="FindRegisterWait_challenge_title" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 0 and challenge_category like '%' || #{param3} || '%'
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+      <select id="FindRegisterWait_challenge_name" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 0 and challenge_title like '%' || #{param3} || '%' 
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+      <select id="FindRegisterWait_challenge_public" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 0 and challenge_public = #{param3} 
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+   
+  
+   
+   <select id="challenge_content" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge where challenge_state = 0 and challenge_num = #{param1}
+   </select>
+   
+   <select id="challenge_vote_content" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge where challenge_state = 1 and challenge_num = #{param1}
+   </select>
+   
+   <select id="challenge_vote_count" resultType="int">
+      select count(*) from challenge_like where challenge_num = #{param1}
+   </select>
+   
+   <update id="ChallengeApproval">
+   		update challenge set challenge_title = #{param2}, challenge_category = #{param3}, challenge_type = #{param4}, challenge_frequency = #{param5}, challenge_start = #{param6}, challenge_end = #{param7}, challenge_fee = #{param8}, challenge_time = #{param9}, challenge_detail = #{param10}, challenge_state = 2, challenge_exp = #{param11}  where challenge_num = #{param1}
+   </update>
+   
+   <update id="PrivateChallengeApproval">
+   		update challenge set challenge_state = 2, challenge_code = #{param2} where challenge_num = #{param1}
+   </update>
+   
+   <select id="challenge_content_vote_comment" resultType="com.study.springboot.dto.CommentDto">
+		select * from vote_comment where challenge_num = #{param1}
+   </select>
+   
+   
+   <select id="All_Ongoing_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 2 and challenge_end <![CDATA[>= sysdate]]>
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+   <select id="FindOngoing_challenge_title" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 2 and challenge_category like '%' || #{param3} || '%'  and challenge_end <![CDATA[>= sysdate]]>
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+      <select id="FindOngoing_challenge_name" resultType="com.study.springboot.dto.ChallengeDto"> and challenge_end <![CDATA[>= sysdate]]>
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 2 and challenge_title like '%' || #{param3} || '%' 
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+      <select id="FindOngoing_challenge_public" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 2 and challenge_public = #{param3}  and challenge_end <![CDATA[>= sysdate]]>
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+   
+      
+   
+   <select id="AllOngoingchallengeCount" resultType="int">
+      select count(*) from challenge where challenge_state = 2
+   </select>
+   
+   
+   <update id="approve_public_challenge"> <!-- 공개챌린지를 투표하도록 승인 -->
+   		update challenge set challenge_state = #{param2} where challenge_num  = #{param1}
+   </update>
+   
+   
+<!--    <![CDATA[DESC]]> 수정-->
+      <select id="public_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 1 and challenge_public = 0
+							   order by challenge_num <![CDATA[DESC]]>) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+	
+<!--상태별 챌린지 카운트 -->
+   <select id="public_challenge_count" resultType="int">
+      select count(*) from challenge where challenge_state = #{param1} and challenge_public = #{param2} or challenge_public = #{param3}
+   </select>
+   
+   <select id="public_challenge_content" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge where challenge_state = 1 and challenge_public = 0 and challenge_num = #{param1}
+   </select>
+   
+   
+   
+	<select id="reward_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 2 and challenge_end <![CDATA[< sysdate]]>
+							   order by challenge_num) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+   </select>
+   
+      <select id="reward_challenge_count" resultType="int">
+      select count(*) from challenge where challenge_state = 2 and challenge_end <![CDATA[< sysdate]]>
+   </select>
+   
+   
+   <select id="ongoing_challenge_content" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge where challenge_state = 2 and challenge_num = #{param1}
+   </select>
+   
+   <select id="end_challenge_content" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge where challenge_state = 3 and challenge_num = #{param1}
+   </select>
+   
+   
+   
+   <select id="read_participant" resultType="com.study.springboot.dto.MemberDto">
+		select * from member where member_no in (select member_num from record where challenge_num = #{param1})
+   </select>
+   
+   
+   <update id="save_token">
+   		update member set member_token = #{param2} where member_id  = #{param1}
+   </update>
+   
+   <select id="get_token" resultType="String">
+		select member_token from member where member_id = #{param1}
+   </select>
+   
+   <select id="GetRecord" resultType="com.study.springboot.dto.RecordDto">
+		select b.member_id, a.member_num, a.certificate_count, a.all_count, a.challenge_fee from record a, member b where member_num = member_no and challenge_num = #{param1}
+   </select>
+
+   <select id="GetAllRecord" resultType="com.study.springboot.dto.RecordAllDto">
+		select * from record
+   </select>   
+   
+   
+   <update id="setRecord">
+		update record set reward = #{param3}, receipt = <![CDATA[sysdate]]> where member_num = #{param1} and challenge_num = #{param2}
+   </update>
+      
+   <insert id="setMoney">
+	      insert into cash_list(list_cash_num, list_member_id, list_cash_content, list_cash_check) values(list_cash_seq.nextval, #{param1}, #{param2}, 5)
+   </insert>
+   	      
+   <insert id="setReward">
+	      insert into cash_list(list_cash_num, list_member_id, list_cash_content, list_cash_check) values(list_cash_seq.nextval, #{param1}, #{param2}, 2)
+   </insert>
+	
+
+	<select id="end_challenge" resultType="com.study.springboot.dto.ChallengeDto">
+		select * from ( select <![CDATA[rownum num]]>, A.* 
+						from ( select * 
+							   from challenge 
+							   where challenge_state = 3
+							   order by challenge_end DESC ) A  
+		       			where <![CDATA[rownum <=]]> #{param1} ) B 
+		where B.num <![CDATA[>=]]> #{param2}
+	</select>
+	
+	
+	<select id="getMemberInfo" resultType="com.study.springboot.dto.MemberDto">
+		select * from member where member_id = #{param1}
+   </select>     
+   
+   <update id="setExp">
+		update member set member_exp = #{param1} where member_id = #{param2}
+   </update>
+   
+	<update id="capability">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	<update id="health">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	<update id="relationship">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	<update id="assets">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	<update id="life">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	<update id="hobby">
+		update member set member_hobby = #{param1} where member_id = #{param2}
+	</update>
+	
+	
+	<select id="like_count" resultType="int">
+		select count(*) from vote_comment_like where comment_num = #{param1}
+	</select>
+	
+	<select id="get_feed_list" resultType="com.study.springboot.dto.FeedDto">
+		select * from feed where challenge_num = #{param1}
+   </select>
+	
+	<delete id="certificate_delete">
+		delete from certificate where challenge_num = #{param1}
+	</delete>
+	
+	<select id="get_nickname" resultType="String">
+		select member_nickname from member where member_id = #{param1}
+   </select>
+	
+	
+</mapper>

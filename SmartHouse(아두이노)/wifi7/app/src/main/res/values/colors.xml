@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#008577</color>
+    <color name="colorPrimaryDark">#00574B</color>
+    <color name="colorAccent">#D81B60</color>
+    <color name="press">#449922</color>
+<!--    <color name="defalut">#4CC74A</color>-->
+    <color name="smart">#FD5ACE69</color>
+    <color name="yujin">#FAF8F8</color>
+
+    <color name="defalut">#BACE87</color>
+    <color name="on">#BACE87</color>
+    <color name="off">#FFFFFF</color>
+</resources>

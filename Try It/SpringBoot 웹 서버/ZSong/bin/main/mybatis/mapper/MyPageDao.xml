@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.study.springboot.dao.MyPageDao">
+
+	<select id="MyPageMainList"
+		resultType="com.study.springboot.dto.MemberDto">
+		select * from member where member_id like #{param1}
+	</select>
+
+	<select id="MyPageCertificateDate"
+		resultType="com.study.springboot.dto.MyPageCdateDto">
+		select a.challenge_num challenge_num, a.challenge_title
+		challenge_title, a.challenge_type challenge_type, a.challenge_time
+		challenge_time, b.certificate_check certificate_check,
+		b.certificate_date certificate_date
+		from challenge a, certificate b
+		where a.challenge_num = b.challenge_num and b.member_num = #{param1}
+		order by b.certificate_date
+	</select>
+
+	<select id="MyPageMemo"
+		resultType="com.study.springboot.dto.MypageMemoDto">
+		select * from memo
+		where memo_userid like #{param1}
+		order by memo_date <![CDATA[desc]]>
+	</select>
+
+	<insert id="MyPageMemoInsert">
+		insert into memo(memo_no, memo_title, memo_content,
+		memo_userid,
+		memo_date)
+		values (memo_seq.nextval, #{param1},
+		#{param2},#{param3}, #{param4})
+	</insert>
+
+	<update id="PasswordModify">
+		update member
+		set member_pw = #{param2}
+		where member_id
+		like #{param1}
+	</update>
+
+	<select id="MyPageQnAList"
+		resultType="com.study.springboot.dto.QnADto">
+		select * from question
+		where member_id like #{param1}
+		order by
+		question_date <![CDATA[desc]]>
+	</select>
+
+	<insert id="MyPageQnAInsert">
+		insert into question(question_num, member_id, question_title,
+		question_Content, question_Picture, question_date)
+		values
+		(question_seq.nextval, #{param1}, #{param2},#{param3}, #{param4}, <![CDATA[sysdate]]>)
+	</insert>
+
+	<insert id="MyPageComplaintChallenge">
+		insert into complaint(complaint_num, challenge_num, member_id,
+		complaint_content, complaint_date, complaint_state)
+		values
+		(COMPLAINT_seq.nextval, #{param1}, #{param2}, #{param3}, <![CDATA[sysdate]]>,
+		0)
+	</insert>
+
+	<insert id="MyPageComplaintComment">
+		insert into complaint(complaint_num, comment_num, member_id,
+		complaint_content, complaint_date, complaint_state)
+		values
+		(COMPLAINT_seq.nextval, #{param1}, #{param2}, #{param3}, <![CDATA[sysdate]]>,
+		0)
+	</insert>
+
+	<select id="MyPageComplaintList"
+		resultType="com.study.springboot.dto.ComplaintDto">
+		select * from complaint
+				where member_id like #{param1}
+				order by
+				complaint_date <![CDATA[desc]]>
+	</select>
+
+	<update id="ProfileModify">
+		update member
+		set member_nickname = #{param2} ,
+		member_introduction = #{param3}
+		where member_id like #{param1}
+	</update>
+
+	<select id="MyPageChallengeList"
+		resultType="com.study.springboot.dto.ChallengeDto">
+		select * from challenge
+				where challenge_num in (select challenge_num
+										from record
+										where member_num = (select member_no
+															from member
+															where member_id like #{param1}))
+	</select>
+	
+	<select id="ProfileImg" resultType="String">
+		select member_profile_image from member where member_id like #{param1}
+	</select>
+	
+	<select id="NickName" resultType="String">
+		select member_nickname from member where member_id like #{param1}
+	</select>
+	
+	<select id="MyPageComment"
+		resultType="com.study.springboot.dto.CommentDto">
+		select * from vote_comment
+				where comment_num = #{param1}
+	
+	</select>
+	
+</mapper>

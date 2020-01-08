@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.study.springboot.dao.AndroidChatDao">
+
+   <select id="chat_room_list" resultType="com.study.springboot.dto.AndroidChatListDto">
+    select challenge_num, challenge_title, challenge_first_image from challenge where challenge_public = 1 and challenge_num in ( 
+    select challenge_num from record where reward is null and member_num = (select member_no from member where member_id = #{param1} ))
+   </select>
+   
+   <select id="participant_count" resultType="int">
+   		select count(*) from record where challenge_num = #{param1}
+   </select>
+   
+   <select id="member_nickname" resultType="String">
+   		select member_nickname from member where member_id = #{param1}
+   </select>
+   
+</mapper>

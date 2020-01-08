@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.study.android.mytry">
+
+    <permission
+        android:name="com.study.android.mytry.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <uses-permission android:name="com.study.android.mytry.permission.MAPS_RECEIVE" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" /> <!-- Don't require camera, as this requires a rear camera. This allows it to work on the Nexus 7 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" /> <!-- Required by older versions of Google Play services to create IID tokens -->
+    <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
+    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW"/>
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" /> <!-- TODO replace above two with next line after Android 4.2 -->
+    <!-- <uses-feature android:name="android.hardware.camera.any"/> -->
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.flash"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.screen.landscape"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.wifi"
+        android:required="false" />
+
+    <application
+        android:name=".login.GlobalApplication"
+        android:allowBackup="true"
+        android:hardwareAccelerated="false"
+        android:largeHeap="true"
+        android:appComponentFactory="android.support.v4.app.CoreComponentFactory"
+        android:debuggable="true"
+        android:icon="@mipmap/ic_launcher_try"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_try_round"
+        android:supportsRtl="true"
+        android:testOnly="true"
+        android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+        android:usesCleartextTraffic="true"
+        tools:ignore="HardcodedDebugMode">
+        <service
+            android:name="com.study.android.mytry.certification.MyCounterService"
+            android:enabled="true"
+            android:exported="true" />
+
+        <activity android:name=".chat.chat_room"></activity>
+        <activity android:name=".chat.private_chat"></activity>
+        <activity android:name=".mypage.setup.ComplaintDetail"></activity>
+        <activity android:name=".mypage.setup.ComplaintMain" />
+        <activity android:name=".mypage.setup.QnAResult" />
+        <activity android:name=".mypage.setup.QnAWrite" />
+        <activity android:name=".mypage.setup.PasswordModify" />
+        <activity android:name=".search.search_filer_main"></activity>
+        <activity android:name=".mypage.MemoInsert" />
+        <activity android:name=".challenge_private.CreationParticipation" />
+        <activity android:name=".challenge_private.CreationQrCode" />
+        <activity android:name=".certification.Certificate_detail" />
+        <activity android:name=".search.search_bookmark" />
+        <activity android:name=".search.guide" />
+        <activity android:name=".search.search_filer" />
+        <activity android:name=".search.Search_detail" />
+        <activity android:name=".search.Search_detail1" />
+        <activity android:name=".certification.Certificate_map" />
+        <activity android:name=".certification.Certificate_map_comment" />
+        <activity android:name=".certification.Certificate_voice" />
+        <activity android:name=".certification.Certificate_gallery" />
+        <activity android:name=".mypage.MemoDetail" />
+        <activity android:name=".mypage.setup.MypageBank" />
+        <activity android:name=".challenge_public.Challenge_Content" />
+        <activity android:name=".feed.FeedComment" />
+        <activity android:name=".feed.FeedLike" />
+
+        <activity android:name=".feed.Userpage" />
+
+
+
+        <meta-data
+            android:name="com.google.android.gms.ads.AD_MANAGER_APP"
+            android:value="true" />
+
+        <activity
+            android:name="com.study.android.mytry.certification.Certificate_map_popup"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <activity
+            android:name=".search.PopupActivity"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".cash.Cash_reward"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".cash.Cash_withdrawal"
+            android:theme="@android:style/Theme.Dialog" />
+        <activity
+            android:name=".cash.Cash_deposit"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <activity
+            android:name=".certification.Certificate_chooseType_popup"
+            android:theme="@android:style/Theme.Dialog" />
+
+        <activity android:name=".search.search_main" />
+        <activity android:name=".certification.Certificate_camera" />
+        <activity android:name=".challenge_private.CreationFifth" />
+        <activity android:name=".challenge_private.CreationFourth" />
+        <activity android:name=".challenge_private.CreationThrid" />
+        <activity android:name=".challenge_private.CreationSecond" />
+        <activity android:name=".challenge_private.CreationFirst" />
+        <activity android:name=".challenge_public.CreationPage" />
+        <activity android:name=".cash.Kakao_cash" />
+        <activity android:name=".login.Logout" />
+        <activity android:name=".login.Password" />
+        <activity android:name=".login.Login" />
+        <activity android:name=".main.MainActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"/>
+        <activity android:name=".login.JoinActivity" />
+        <activity android:name=".login.Intro">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+        <meta-data
+            android:name="com.kakao.sdk.AppKey"
+            android:value="@string/kakao_app_key" />
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
+
+        <meta-data
+            tools:replace="android:value" android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
+
+        <service
+            android:name=".chat.MyFirebaseMessagingService"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+    </application>
+
+</manifest>

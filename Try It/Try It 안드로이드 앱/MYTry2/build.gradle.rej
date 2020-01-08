@@ -1,0 +1,9 @@
+diff a/MYTry2/build.gradle b/MYTry2/build.gradle	(rejected hunks)
+@@ -12,6 +12,7 @@
+ +        classpath 'com.google.gms:google-services:4.0.0'
+ +=======
+          classpath 'com.google.gms:google-services:4.3.2'
+++>>>>>>> 98f0b4a091142ceb2e4dca67a25f5853cf3607b7
+          // NOTE: Do not place your application dependencies here; they belong
+          // in the individual module build.gradle files
+      }

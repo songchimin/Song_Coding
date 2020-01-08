@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="app/build/generated/aidl_source_output_dir/debug/compileDebugAidl/out"/>
+	<classpathentry kind="src" path="app/build/generated/not_namespaced_r_class_sources/debug/r"/>
+	<classpathentry kind="src" path="app/build/generated/source/buildConfig/androidTest/debug"/>
+	<classpathentry kind="src" path="app/build/generated/source/buildConfig/debug"/>
+	<classpathentry kind="src" path="app/src/androidTest/java"/>
+	<classpathentry kind="src" path="app/src/main/java"/>
+	<classpathentry kind="src" path="app/src/test/java"/>
+	<classpathentry kind="lib" path="app/build/intermediates/merged_java_res/debug/out.jar"/>
+	<classpathentry kind="lib" path="app/lib/libDaumMapAndroid.jar"/>
+	<classpathentry kind="lib" path="app/lib/universal-image-loader-1.9.5-javadoc.jar"/>
+	<classpathentry kind="lib" path="app/lib/universal-image-loader-1.9.5-sources.jar"/>
+	<classpathentry kind="lib" path="app/lib/universal-image-loader-1.9.5.jar"/>
+	<classpathentry kind="lib" path="gradle/wrapper/gradle-wrapper.jar"/>
+	<classpathentry kind="output" path="app/build/intermediates/javac/debug/classes"/>
+</classpath>

@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+   
+<mapper namespace="com.study.springboot.dao.SeleeDao">
+     
+   <!-- 인증화면 출력 -->  
+   <select id="CertificateList" resultType="com.study.springboot.dto.CertificateDto">
+         select a.challenge_num challenge_num, b.certificate_check certificate_check, a.challenge_type challenge_type, a.challenge_title challenge_title, a.challenge_start challenge_start, a.challenge_end challenge_end, a.challenge_frequency challenge_frequency, a.challenge_time challenge_time, a.challenge_first_image challenge_first_image
+      from challenge a, (select * from certificate where to_char(certificate_date, 'YY/MM/DD') in (SELECT to_char(SYSDATE, 'YY/MM/DD') FROM DUAL) and member_num = (select member_no from member where member_id = #{param1})) b 
+      where a.challenge_num = b.challenge_num order by certificate_check
+   </select>  
+
+   <select id="CertificateList_count" resultType="int">
+      select count(*) from certificate where challenge_num = #{param1} and member_num = (select member_no from member where member_id = #{param2})
+   </select>
+   
+   <select id="CertificateList_check_count" resultType="int">
+      select count(*) from certificate where challenge_num = #{param1} and member_num = (select member_no from member where member_id = #{param2}) and certificate_check = 1
+   </select>
+   
+   <!-- 피드 추가 -->
+   <insert id="feed_insert">
+         insert into feed(feed_num, member_id, challenge_num, challenge_title, feed_info, feed_comment)
+       values(feed_seq.nextval, #{param1}, #{param2}, #{param3}, #{param4}, #{param5})
+   </insert>
+   
+   <insert id="map_insert">
+         insert into map(challenge_num, member_id, map_num, latitude, longitude)
+       values(#{param1}, #{param2}, map_seq.nextval, #{param3}, #{param4})
+   </insert>
+   
+   <delete id="map_delete">
+         delete from map 
+         where challenge_num = #{param1} and member_id=#{param2} and to_char(certificate_date, 'YY/MM/DD') in (SELECT to_char(SYSDATE, 'YY/MM/DD') FROM DUAL);
+   </delete>
+   
+   <update id="certificate_update">
+         update certificate set certificate_check=certificate_check+1 
+         where challenge_num = #{param1} and member_num =(select member_no from member where member_id = #{param2}) and to_char(certificate_date, 'YY/MM/DD') in (SELECT to_char(SYSDATE, 'YY/MM/DD') FROM DUAL)
+   </update>
+   
+      <update id="record_update">
+         update record set certificate_count=certificate_count+1 
+         where challenge_num = #{param1} and member_num =(select member_no from member where member_id = #{param2})
+   </update>
+   
+   <!-- 참가하기 -->
+   <insert id="record_insert">
+         insert into record(challenge_num, member_num, all_count, challenge_fee)
+       values(#{param1}, (select member_no from member where member_id = #{param2}), #{param3}, #{param4})
+   </insert>
+   
+   <insert id="certificate_insert">
+         insert into certificate(challenge_num, member_num, certificate_date)
+       values(#{param1}, (select member_no from member where member_id = #{param2}), #{param3})
+   </insert>
+   
+   <!-- 챌린지 정보 출력 -->
+   <select id="selectChallenge" resultType="com.study.springboot.dto.ChallengeDto">
+      select * from challenge where challenge_num = #{param1}
+   </select>
+
+   <!-- 피드 출력 -->  
+   <select id="FollowFeedList" resultType="com.study.springboot.dto.FeedDto">
+         select * from feed where member_id = (select following_id from follow where follower_id = #{param1}) order by feed_num DESC
+   </select>  
+   
+   <select id="FeedList" resultType="com.study.springboot.dto.FeedDto">
+         select * from feed order by feed_num DESC
+   </select>
+   
+   <select id="MemberList" resultType="com.study.springboot.dto.MemberDto">
+         select * from member where member_id= #{param1}
+   </select>   
+   
+   <select id="LocationList" resultType="com.study.springboot.dto.MapDto">
+         select map_num, latitude, longitude from map 
+         where challenge_num = #{param1} and member_id = #{param2} and to_char(certificate_date, 'YY/MM/DD') = #{param3} order by map_num
+   </select> 
+   
+   <select id="FeedCommentSelectCount" resultType="int">
+      select NVL(count(*),
+      0) from feed_comment where feed_num = #{param1}
+   </select> 
+   
+      <!-- 피드 좋아요 -->
+   <insert id="FeedLikeInsert">
+      insert into feed_like(feed_like,
+      feed_num, member_id)
+      values (feed_like_seq.nextval,
+      #{param1}, #{param2})
+   </insert>
+
+   <delete id="FeedLikeDelete">
+      delete from feed_like where member_id =
+      #{param1} and feed_num =
+      #{param2}
+   </delete>
+
+   <select id="FeedLikeExist" resultType="int">
+      select
+      NVL(count(*),0) from (
+      select * from feed_like
+      where member_id like
+      #{param1} and feed_num = #{param2} )
+   </select>
+
+   <select id="FeedLikeCount" resultType="int">
+      select NVL(count(*),
+      0) from feed_like where feed_num = #{param1}
+   </select>
+   
+      <!-- 댓글 리스트 뷰 -->
+   <insert id="CommentInsert">
+      insert into feed_comment(comment_num, feed_num, member_id,
+      comment_content, commment_date)
+      values (feed_comment_seq.nextval,
+      #{param1}, #{param2}, #{param3}, <![CDATA[sysdate]]>)
+   </insert>
+
+   <select id="CommentSelect"
+      resultType="com.study.springboot.dto.FeedCommentDto">
+      select * from feed_comment order by commment_date <![CDATA[asc]]>
+   </select>
+
+   <!-- 댓글 좋아요 투표 -->
+   <insert id="CommentLikeInsert">
+      insert into feed_comment_like(feed_like_num,
+      feed_num, comment_num,
+      member_id)
+      values
+      (feed_comment_like_seq.nextval, #{param1}, #{param2}, #{param3})
+   </insert>
+
+   <delete id="CommentLikeDelete">
+      delete from feed_comment_like where member_id =
+      #{param1} and feed_num
+      = #{param2} and comment_num = #{param3}
+   </delete>
+
+   <select id="CommentLikeExist" resultType="int">
+      select NVL(count(*),0)
+      from (
+      select * from feed_comment_like
+      where member_id like #{param1}
+      and feed_num = #{param2} and
+      comment_num = #{param3} )
+   </select>
+
+   <select id="CommentLikeCount" resultType="int">
+      select NVL(count(*), 0)
+      from feed_comment_like where feed_num =
+      #{param1} and comment_num
+      = #{param2}
+   </select>
+   
+   <!-- 피드 좋아요 리스트뷰 -->
+   <select id="FeedLikeSelect" resultType="com.study.springboot.dto.FeedLikeDto">
+      select * from feed_like where feed_num = #{param1}
+   </select>
+
+   <!-- 팔로우 -->
+   <select id="followExist" resultType="int">      
+      select NVL(count(*),0)
+      from ( select * from follow
+      where follower_id like #{param1}
+      and following_id like #{param2})
+   </select>
+   
+   <insert id="followInsert">
+      insert into follow(follower_id, following_id)
+      values (#{param1}, #{param2})
+   </insert>
+
+   <delete id="followDelete">
+      delete from follow where follower_id = #{param1} and following_id = #{param2}
+   </delete>
+   
+</mapper>
