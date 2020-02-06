@@ -1,9 +1,0 @@
-﻿  소스.cpp
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(78): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(79): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(80): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(84): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(85): warning C4838: 'double'에서 'GLfloat'(으)로의 변환에는 축소 변환이 필요합니다.
-c:\users\vzcxd\onedrive\desktop\consoleapplication11\consoleapplication11\소스.cpp(1411): warning C4060: switch문에 'case' 또는 'default' 레이블이 없습니다.
-  ConsoleApplication11.vcxproj -> C:\Users\vzcxd\OneDrive\Desktop\ConsoleApplication11\Debug\ConsoleApplication11.exe
-  ConsoleApplication11.vcxproj -> C:\Users\vzcxd\OneDrive\Desktop\ConsoleApplication11\Debug\ConsoleApplication11.pdb (Full PDB)
