@@ -1,0 +1,441 @@
+
+#include "ESP8266.h"
+#include <SoftwareSerial.h>
+#include <Stepper.h>
+
+#include  <Servo.h> //서보모터 라이브러리
+#include "DHT.h"    //온습터 센서 라이브러리
+#define DHTPIN 2
+#define DHTPIN2 3 //3번 가능한지 확인 농장 습도
+#define DHTTYPE DHT11
+
+DHT dht(DHTPIN, DHTTYPE);
+DHT dht2(DHTPIN2, DHTTYPE);
+
+
+#define SSID        "U+Net8B93" 
+#define PASSWORD    "29138318M*"
+//#define SSID        "SongiPhone" 
+//#define PASSWORD    "vzcxds123"
+
+
+SoftwareSerial mySerial(12, 13); /* RX:D11, TX:D10 */
+ESP8266 wifi(mySerial);
+
+
+Servo myservo;  //서보모터 객체 생성
+//int pos = 0; // 일단 서보모터 각도를 45으로 맞춘다.
+int raindrop = A0;  // INPUT PIN 빗물 감지 analog sign
+int motion = 44;  // 인체감지센서를 44번핀으로 설정합니다.
+int light = 51; // 사용할 집 LED를 51번 핀으로 설정합니다.
+ 
+//가스센서
+int GasSensor = A2;
+int fan2 = 10;
+int fan3 = 11;
+int fan = 38;
+int sensorValue = 0;
+int temperature = 0;
+int humidity = 0;
+int rain = 0;
+int sensor;  //이게 현관 그거 아직 안쓰이는중 걍 자동화
+int hh = 32;
+
+//집 작동 상태 변수
+int runFan = 0;
+int runWindow = 0;
+int runLED = 0;
+int runGasfan = 0;
+int runTv = 0;
+int runHumidifier = 0;
+
+
+//농장 상태 변수
+int runFormPump = 0;
+int runFormFan = 0;
+int runFormLED = 0;
+int runFormDoor = 0;
+
+
+int Formtemperature;
+int Formhumidity;
+int formfan = 22; //농장 환풍기
+
+
+int cds = A13;          // 조도센서를 아날로그 0핀(A13)에 연결합니다.
+// LED를 3번핀에 연결합니다.
+int led = 25;           //농장 LED 제어 
+int sensorVal = 0;
+#define A2Pin A12
+#define Relay1 27   //워터펌프
+int cdsValue;
+
+// 함수 millis()
+ unsigned long mt1 = 0;
+ unsigned long mt2 = 0;
+
+int Auto = 0;
+
+int stepsPerRevolution = 1024;
+Stepper myStepper(stepsPerRevolution,7,5,6,4);
+Stepper myStepper2(stepsPerRevolution,4,6,5,7);
+
+
+
+void printUsage(uint8_t mux_id)
+{
+//    char buf[]="사용가능한 명령어\n1 : 켜기\n2 : LED 끄기\nS : LED 상태정보\n\n";
+//    wifi.send(mux_id, buf, strlen(buf));
+}
+
+
+void setup(void)
+{
+    Serial.begin(9600);
+    Serial.print("setup begin\r\n");
+    
+    Serial.print("FW Version:");
+    Serial.println(wifi.getVersion().c_str());
+      
+    if (wifi.setOprToStationSoftAP()) {
+        Serial.print("to station + softap ok\r\n");
+    } else {
+        Serial.print("to station + softap err\r\n");
+    }
+ 
+    if (wifi.joinAP(SSID, PASSWORD)) {
+        Serial.print("Join AP success\r\n");
+        Serial.print("IP: ");
+        Serial.println(wifi.getLocalIP().c_str());    
+    } else {
+        Serial.print("Join AP failure\r\n");
+    }
+    
+    if (wifi.enableMUX()) {
+        Serial.print("multiple ok\r\n");
+    } else {
+        Serial.print("multiple err\r\n");
+      }
+    
+    if (wifi.startTCPServer(80)) {
+        Serial.print("start tcp server ok\r\n");
+    } else {
+        Serial.print("start tcp server err\r\n");
+    }
+    
+    if (wifi.setTCPServerTimeout(360)) { 
+        Serial.print("set tcp server timout 360 seconds\r\n");
+    } else {
+        Serial.print("set tcp server timout err\r\n");
+    }
+    
+    Serial.print("setup end\r\n");
+
+    dht.begin();
+    dht2.begin();
+    
+    myStepper.setSpeed(30);
+    myStepper2.setSpeed(30);
+    myservo.attach(45);  //서보모터 45
+  
+  pinMode(raindrop, INPUT);    //빗물 감지
+   
+  pinMode(GasSensor, INPUT);    //가스센서
+  pinMode(motion, INPUT);       // 인체감지센서
+  pinMode(light, OUTPUT);     // LED의 핀
+  pinMode(fan, OUTPUT);       //집 환풍기 핀
+  pinMode(led, OUTPUT);      // 농장 LED
+  pinMode(Relay1, OUTPUT);  //농장 펌프 제어 릴레이모듈
+ 
+  pinMode(fan3,OUTPUT);    //선풍기 좌 뒤로붐
+  pinMode(fan2,OUTPUT);    //선풍기 우
+  pinMode(formfan,OUTPUT);    //농장 환풍기
+
+  pinMode(hh, OUTPUT);
+}
+ 
+void loop(void)
+{
+  
+  humidity = dht.readHumidity();
+  delay(100); 
+  temperature = dht.readTemperature();
+  delay(100); 
+  rain = analogRead(raindrop);
+  delay(100); 
+  sensor = digitalRead(motion);
+  delay(100); 
+  sensorValue = analogRead(GasSensor);  //가스
+  delay(100); 
+  sensorVal = analogRead(A2Pin);  //토양습도
+  delay(100);
+
+
+  Formtemperature = (-1)*dht2.readTemperature();
+  Formhumidity = dht2.readHumidity();
+ 
+  cdsValue = analogRead(cds);
+  
+    uint8_t buffer[128] = {0};
+    uint8_t mux_id;
+    uint32_t len = wifi.recv(&mux_id, buffer, sizeof(buffer), 100);
+
+    if (len > 0) {
+        Serial.print("Status:[");
+        Serial.print(wifi.getIPStatus().c_str());
+        Serial.println("]");
+        
+        Serial.print("Received from :");
+        Serial.print(mux_id);
+        Serial.print("[");
+
+
+        Serial.print("Received:[");
+        for(uint32_t i = 0; i < len; i++) {
+            Serial.print((char)buffer[i]);
+        }
+        Serial.print("]\r\n");
+
+        char command = buffer[0];
+
+
+    if(Auto == 0)
+    {
+        switch (command){
+
+            case 'a': //창문 작동
+              if(runWindow == 0)
+              {
+//                pos = 90;
+                myservo.write(0);
+                runWindow = 1;
+              }
+              else{
+//                pos = 0;
+                myservo.write(45);
+                runWindow = 0;
+              }
+              break;
+        
+            case 'b': //환풍기 작동
+              if(runGasfan == 1)
+              {
+                digitalWrite(fan,LOW);
+                runGasfan = 0;
+              }
+              else
+              {
+                digitalWrite(fan, HIGH);
+                runGasfan = 1;
+              }
+              break;
+              
+            case 'B': //음성인식 환풍기 작동
+                digitalWrite(fan, HIGH);
+                runGasfan = 1;
+              break;
+  
+            case '2': //음성인식 환풍기 끔
+                digitalWrite(fan,LOW);
+                runGasfan = 0;
+              break;
+              
+            case 'c': //선풍기
+              if(runFan == 1)
+              {
+                digitalWrite(fan2,LOW);
+                runFan = 0;
+              }
+              else
+              {
+                digitalWrite(fan2, HIGH);
+                runFan = 1;
+              }
+              break;
+
+            case 'C': //음성인식 선풍기 켜
+              if(runFan == 0)
+              {
+                digitalWrite(fan2, HIGH);
+                runFan = 1;
+              }
+              break;
+
+            case '3': //음성인식 선풍기 꺼
+                if(runFan == 1)
+              {
+                digitalWrite(fan2,LOW);
+                runFan = 0;
+              }
+              break;
+              
+            case 'd':  //형광등
+              if(runLED  == 1)
+              {
+                digitalWrite(light,LOW);
+                runLED = 0;
+              }
+              else
+              {
+                digitalWrite(light, HIGH);
+                runLED = 1;
+              }
+              break;
+
+            case 'D':  // 음성인식 형광등 켜
+                digitalWrite(light, HIGH);
+                runLED = 1;
+              break;
+
+            case '4':  //형광등
+                digitalWrite(light,LOW);
+                runLED = 0;
+              break;
+              
+            
+            case 'e':  //가습기 추가예정
+              if(runHumidifier == 1)
+              {
+                digitalWrite(hh,LOW);
+                runHumidifier = 0;
+              }
+              else
+              {
+                digitalWrite(hh, HIGH);
+                runHumidifier = 1;
+              }  
+              break;
+            
+             case 'f':  //LCD 추가 예정
+              if(runTv == 1)
+              {
+//                 lcd.noBacklight();
+                runTv = 0;
+              }
+              else
+              {
+//                lcd.backlight();
+                runTv = 1;
+              }
+              break;
+
+              
+              case 'i':  //농장 환풍기
+                if(runFormFan == 1)
+                {
+                  digitalWrite(formfan, LOW);
+                  runFormFan = 0;
+                }
+                else
+                {
+                  digitalWrite(formfan, HIGH);
+                  runFormFan = 1;
+                }
+              break;
+              
+             case 'h':  //농장 펌프
+              if(runFormPump == 1)
+              {
+                digitalWrite(Relay1, LOW);
+                runFormPump = 0;
+              }
+              else
+              {
+                digitalWrite(Relay1, HIGH);
+                runFormPump = 1;
+              }
+              break;
+
+              case 'j':  //농장 문
+                if(runFormDoor == 1)
+                {
+                  
+                  myStepper2.step(stepsPerRevolution);
+                  myStepper2.step(stepsPerRevolution);
+                  myStepper2.step(stepsPerRevolution);
+                  runFormDoor = 0;
+                }
+                else
+                {
+                  myStepper.step(-stepsPerRevolution);
+                  myStepper.step(-stepsPerRevolution);
+                  myStepper.step(-stepsPerRevolution);
+                  runFormDoor = 1;
+                }
+                break;
+                
+              case 'g':  //농장 LED
+              if(runFormLED == 1)
+              {
+                digitalWrite(led,LOW);
+                runFormLED = 0;
+              }
+              else
+              {
+                digitalWrite(led, HIGH);
+                runFormLED = 1;
+              }
+              break;
+
+              case 'u':
+                Auto = 1;
+                break;
+       
+            default:
+              break;             
+        } 
+        
+                                                          //창문, 집환풍, 선풍기, 집전등, 가습기, 티비, +예정 농장LED, 농장환풍기, 농장펌프, 농장문       + 집온도 집습도 빗물 가스 농장온도 농장습도 토양습도  Formtemperature Formhumidity
+        sprintf(buffer, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", runWindow, runGasfan, runFan, runLED, runHumidifier, runTv, runFormLED, runFormPump, runFormFan, runFormDoor , temperature, humidity, rain, sensorValue, 26, 42, sensorVal);
+        delay(100);
+        wifi.send(mux_id, buffer, strlen(buffer));
+        mt1=mt2;
+        delay(300);
+
+     }
+     else
+     {
+         switch (command){
+
+            case 'n':
+              Auto = 0;
+                break;
+        }
+        
+                                                                //창문, 집환풍, 선풍기, 집전등, 가습기, 티비, +예정 농장LED, 농장환풍기, 농장펌프, 농장문       + 집온도 집습도 빗물 가스 농장온도 농장습도 토양습도  Formtemperature Formhumidity
+        sprintf(buffer, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", runWindow, runGasfan, runFan, runLED, runHumidifier, runTv, runFormLED, runFormPump, runFormFan, runFormDoor , temperature, humidity, rain, sensorValue, 26, 42, sensorVal);
+        delay(100);
+        wifi.send(mux_id, buffer, strlen(buffer));
+        mt1=mt2;
+        delay(300);
+     }
+     
+    }
+    else
+    {
+
+       if(Auto == 1){
+         if(cdsValue > 980){
+            digitalWrite(led, HIGH);
+             runFormLED = 1;
+        }
+        else{
+            digitalWrite(led, LOW);
+             runFormLED = 0;
+        }
+       }
+
+    
+     unsigned long mt2 = millis();
+     
+      if(mt2-mt1> 7000){ 
+       sprintf(buffer, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", runWindow, runGasfan, runFan, runLED, runHumidifier, runTv, runFormLED, runFormPump, runFormFan, runFormDoor , temperature, humidity, rain, sensorValue, 26, 42, sensorVal);
+       wifi.send(mux_id, buffer, strlen(buffer));
+       Serial.println(String(cdsValue)+ String(runFormPump)+"  " +String(temperature) + " " + String(humidity)  + " " +  String(rain)  + " " +  String(sensorValue)  + " " +  String(Formtemperature)  + " " +  String(Formhumidity)  + " " +  String(sensorVal) );
+        mt1=mt2;
+        delay(300);
+     }
+    
+    }
+    
+}
