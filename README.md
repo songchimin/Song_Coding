@@ -1,1 +1,1 @@
-![kakao](https://user-images.githubusercontent.com/52474694/73925542-8dc52280-4911-11ea-827d-5c38a7780e4c.png)
+![그림1](https://user-images.githubusercontent.com/52474694/73925992-3f645380-4912-11ea-8c11-514e35bc7ad5.png)
