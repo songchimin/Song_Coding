@@ -1,1 +1,5 @@
 ![그림1](https://user-images.githubusercontent.com/52474694/73925992-3f645380-4912-11ea-8c11-514e35bc7ad5.png)
+![그림2](https://user-images.githubusercontent.com/52474694/73926041-560aaa80-4912-11ea-9326-fd87f85f9096.png)
+![그림3](https://user-images.githubusercontent.com/52474694/73926046-57d46e00-4912-11ea-8c40-861292b3be58.png)
+![그림4](https://user-images.githubusercontent.com/52474694/73926049-599e3180-4912-11ea-9f79-f3372f3b8d49.png)
+![그림5](https://user-images.githubusercontent.com/52474694/73926052-5b67f500-4912-11ea-9382-999bbfeb997e.png)
